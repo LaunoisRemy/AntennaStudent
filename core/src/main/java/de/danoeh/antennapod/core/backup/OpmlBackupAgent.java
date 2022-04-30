@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
@@ -74,9 +75,9 @@ public class OpmlBackupAgent extends BackupAgentHelper {
             try {
                 digester = MessageDigest.getInstance("MD5");
                 writer = new OutputStreamWriter(new DigestOutputStream(byteStream, digester),
-                        Charset.forName("UTF-8"));
+                        StandardCharsets.UTF_8);
             } catch (NoSuchAlgorithmException e) {
-                writer = new OutputStreamWriter(byteStream, Charset.forName("UTF-8"));
+                writer = new OutputStreamWriter(byteStream, StandardCharsets.UTF_8);
             }
 
             try {
@@ -134,9 +135,9 @@ public class OpmlBackupAgent extends BackupAgentHelper {
             try {
                 digester = MessageDigest.getInstance("MD5");
                 reader = new InputStreamReader(new DigestInputStream(data, digester),
-                        Charset.forName("UTF-8"));
+                        StandardCharsets.UTF_8);
             } catch (NoSuchAlgorithmException e) {
-                reader = new InputStreamReader(data, Charset.forName("UTF-8"));
+                reader = new InputStreamReader(data, StandardCharsets.UTF_8);
             }
 
             try {

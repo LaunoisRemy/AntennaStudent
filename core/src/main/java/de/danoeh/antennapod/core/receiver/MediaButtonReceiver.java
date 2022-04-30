@@ -32,11 +32,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
 			serviceIntent.putExtra(EXTRA_KEYCODE, event.getKeyCode());
 			serviceIntent.putExtra(EXTRA_SOURCE, event.getSource());
 			//detect if this is a hardware button press
-			if (event.getEventTime() > 0 || event.getDownTime() > 0) {
-				serviceIntent.putExtra(EXTRA_HARDWAREBUTTON, true);
-			} else {
-				serviceIntent.putExtra(EXTRA_HARDWAREBUTTON, false);
-			}
+			serviceIntent.putExtra(EXTRA_HARDWAREBUTTON, event.getEventTime() > 0 || event.getDownTime() > 0);
 			ContextCompat.startForegroundService(context, serviceIntent);
 		}
 

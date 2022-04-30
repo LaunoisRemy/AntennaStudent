@@ -112,7 +112,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
      * therefore use a real lock.
      */
     private class PlayerLock {
-        private ReentrantLock lock = new ReentrantLock();
+        private final ReentrantLock lock = new ReentrantLock();
 
         public void lock() {
             if (!useCallerThread) {

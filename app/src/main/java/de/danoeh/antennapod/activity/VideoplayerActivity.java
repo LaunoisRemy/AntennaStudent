@@ -86,7 +86,7 @@ public class VideoplayerActivity extends CastEnabledActivity implements SeekBar.
     private boolean videoSurfaceCreated = false;
     private boolean destroyingDueToReload = false;
     private long lastScreenTap = 0;
-    private Handler videoControlsHider = new Handler(Looper.getMainLooper());
+    private final Handler videoControlsHider = new Handler(Looper.getMainLooper());
     private VideoplayerActivityBinding viewBinding;
     private PlaybackController controller;
     private boolean showTimeLeft = false;

@@ -221,7 +221,7 @@ public class AddFeedFragment extends Fragment {
         if (title == null) {
             title = getString(R.string.local_folder);
         }
-        Feed dirFeed = new Feed(Feed.PREFIX_LOCAL_FOLDER + uri.toString(), null, title);
+        Feed dirFeed = new Feed(Feed.PREFIX_LOCAL_FOLDER + uri, null, title);
         dirFeed.setItems(Collections.emptyList());
         dirFeed.setSortOrder(SortOrder.EPISODE_TITLE_A_Z);
         Feed fromDatabase = DBTasks.updateFeed(getContext(), dirFeed, false);

@@ -116,7 +116,7 @@ public class OpmlImportActivity extends AppCompatActivity {
 
         Uri uri = getIntent().getData();
         if (uri != null && uri.toString().startsWith("/")) {
-            uri = Uri.parse("file://" + uri.toString());
+            uri = Uri.parse("file://" + uri);
         } else {
             String extraText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
             if (extraText != null) {

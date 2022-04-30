@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PostDownloaderTask implements Runnable {
-    private List<Downloader> downloads;
+    private final List<Downloader> downloads;
 
     public PostDownloaderTask(List<Downloader> downloads) {
         this.downloads = downloads;

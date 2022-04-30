@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,8 +53,8 @@ public class GpodnetService implements ISyncService {
     private static final int UPLOAD_BULK_SIZE = 30;
     private static final MediaType TEXT = MediaType.parse("plain/text; charset=utf-8");
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private String baseScheme;
-    private int basePort;
+    private final String baseScheme;
+    private final int basePort;
     private final String baseHost;
     private final String deviceId;
     private String username;
@@ -519,7 +520,7 @@ public class GpodnetService implements ISyncService {
         RequestBody requestBody = RequestBody.create(TEXT, "");
         Request request = new Request.Builder().url(url).post(requestBody).build();
         try {
-            String credential = Credentials.basic(username, password, Charset.forName("UTF-8"));
+            String credential = Credentials.basic(username, password, StandardCharsets.UTF_8);
             Request authRequest = request.newBuilder().header("Authorization", credential).build();
             Response response = httpClient.newCall(authRequest).execute();
             checkStatusCode(response);

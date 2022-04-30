@@ -13,7 +13,7 @@ public class NthMatcher {
 
     public static <T> Matcher<T> nth(final Matcher<T> matcher, final int index) {
         return new BaseMatcher<T>() {
-            AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger count = new AtomicInteger(0);
 
             @Override
             public boolean matches(final Object item) {

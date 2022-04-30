@@ -240,7 +240,7 @@ public final class Log {
             tr.printStackTrace(trPW);
             trPW.flush();
         }
-        return println_native(bufID, priority, tag, msg + trSW.toString());
+        return println_native(bufID, priority, tag, msg + trSW);
     }
 
 }

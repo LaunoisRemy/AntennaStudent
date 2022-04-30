@@ -38,7 +38,7 @@ public class ID3Reader {
         while (getPosition() < tagContentStartPosition + tagHeader.getSize()) {
             FrameHeader frameHeader = readFrameHeader();
             if (frameHeader.getId().charAt(0) < '0' || frameHeader.getId().charAt(0) > 'z') {
-                Log.d(TAG, "Stopping because of invalid frame: " + frameHeader.toString());
+                Log.d(TAG, "Stopping because of invalid frame: " + frameHeader);
                 return;
             }
             readFrame(frameHeader);
@@ -46,7 +46,7 @@ public class ID3Reader {
     }
 
     protected void readFrame(@NonNull FrameHeader frameHeader) throws IOException, ID3ReaderException {
-        Log.d(TAG, "Skipping frame: " + frameHeader.toString());
+        Log.d(TAG, "Skipping frame: " + frameHeader);
         skipBytes(frameHeader.getSize());
     }
 

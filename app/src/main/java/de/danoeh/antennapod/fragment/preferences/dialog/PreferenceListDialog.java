@@ -8,7 +8,7 @@ import de.danoeh.antennapod.R;
 
 public class PreferenceListDialog {
     protected Context context;
-    private String title;
+    private final String title;
     private OnPreferenceChangedListener onPreferenceChangedListener;
     private int selectedPos = 0;
 

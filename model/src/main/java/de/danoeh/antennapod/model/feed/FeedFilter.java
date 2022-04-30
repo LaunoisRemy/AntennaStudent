@@ -95,11 +95,7 @@ public class FeedFilter implements Serializable {
 
         // if they only set minimal duration filter and arrived here, autodownload
         // should happen
-        if (hasMinimalDurationFilter()) {
-            return true;
-        }
-
-        return false;
+        return hasMinimalDurationFilter();
     }
 
     public String getIncludeFilter() {

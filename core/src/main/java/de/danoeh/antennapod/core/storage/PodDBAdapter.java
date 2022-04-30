@@ -1205,7 +1205,7 @@ public class PodDBAdapter {
             }
             // there's an extra ',', get rid of it
             builder.deleteCharAt(builder.length() - 1);
-            limitFeeds = KEY_FEED + " IN (" + builder.toString() + ") AND ";
+            limitFeeds = KEY_FEED + " IN (" + builder + ") AND ";
         }
 
         final String query = "SELECT " + KEY_FEED + ", COUNT(" + TABLE_NAME_FEED_ITEMS + "." + KEY_ID + ") AS count "

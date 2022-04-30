@@ -91,7 +91,7 @@ public class MainActivity extends CastEnabledActivity {
     private View navDrawer;
     private LockableBottomSheetBehavior sheetBehavior;
     private long lastBackButtonPressTime = 0;
-    private RecyclerView.RecycledViewPool recycledViewPool = new RecyclerView.RecycledViewPool();
+    private final RecyclerView.RecycledViewPool recycledViewPool = new RecyclerView.RecycledViewPool();
     private int lastTheme = 0;
 
     @NonNull
@@ -572,7 +572,7 @@ public class MainActivity extends CastEnabledActivity {
         if (uri == null || uri.getPath() == null) {
             return;
         }
-        Log.d(TAG, "Handling deeplink: " + uri.toString());
+        Log.d(TAG, "Handling deeplink: " + uri);
         switch (uri.getPath()) {
             case "/deeplink/search":
                 String query = uri.getQueryParameter("query");

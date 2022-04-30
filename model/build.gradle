@@ -4,6 +4,7 @@ plugins {
 apply from: "../common.gradle"
 
 dependencies {
+    implementation 'androidx.annotation:annotation:1.4.0-alpha02'
     annotationProcessor "androidx.annotation:annotation:$annotationVersion"
     implementation "androidx.media:media:$mediaVersion"
 

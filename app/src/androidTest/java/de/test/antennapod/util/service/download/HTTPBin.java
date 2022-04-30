@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -140,27 +141,22 @@ public class HTTPBin extends NanoHTTPD {
                 Log.w(TAG, "No credentials provided");
                 return getUnauthorizedResponse();
             }
-            try {
-                String credentials = new String(Base64.decode(headers.get("authorization").split(" ")[1], 0), "UTF-8");
-                String[] credentialParts = credentials.split(":");
-                if (credentialParts.length != 2) {
-                    Log.w(TAG, "Unable to split credentials: " + Arrays.toString(credentialParts));
-                    return getInternalError();
-                }
-                if (credentialParts[0].equals(segments[2])
-                        && credentialParts[1].equals(segments[3])) {
-                    Log.i(TAG, "Credentials accepted");
-                    return getOKResponse();
-                } else {
-                    Log.w(TAG, String.format("Invalid credentials. Expected %s, %s, but was %s, %s",
-                            segments[2], segments[3], credentialParts[0], credentialParts[1]));
-                    return getUnauthorizedResponse();
-                }
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            String credentials = new String(Base64.decode(headers.get("authorization").split(" ")[1], 0), StandardCharsets.UTF_8);
+            String[] credentialParts = credentials.split(":");
+            if (credentialParts.length != 2) {
+                Log.w(TAG, "Unable to split credentials: " + Arrays.toString(credentialParts));
                 return getInternalError();
             }
+            if (credentialParts[0].equals(segments[2])
+                    && credentialParts[1].equals(segments[3])) {
+                Log.i(TAG, "Credentials accepted");
+                return getOKResponse();
+            } else {
+                Log.w(TAG, String.format("Invalid credentials. Expected %s, %s, but was %s, %s",
+                        segments[2], segments[3], credentialParts[0], credentialParts[1]));
+                return getUnauthorizedResponse();
+            }
+
         } else if (func.equalsIgnoreCase("gzip")) {
             try {
                 int size = Integer.parseInt(param);

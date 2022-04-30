@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import de.danoeh.antennapod.core.export.ExportWriter;
 import de.danoeh.antennapod.core.storage.DBReader;
@@ -20,8 +21,10 @@ import io.reactivex.Observable;
 public class DocumentFileExportWorker {
 
     private final @NonNull ExportWriter exportWriter;
-    private @NonNull Context context;
-    private @NonNull Uri outputFileUri;
+    private @NonNull
+    final Context context;
+    private @NonNull
+    final Uri outputFileUri;
 
     public DocumentFileExportWorker(@NonNull ExportWriter exportWriter, @NonNull Context context, @NonNull Uri outputFileUri) {
         this.exportWriter = exportWriter;
@@ -40,7 +43,7 @@ public class DocumentFileExportWorker {
                 if (outputStream == null) {
                     throw new IOException();
                 }
-                writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
+                writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
                 exportWriter.writeDocument(DBReader.getFeedList(), writer, context);
                 subscriber.onNext(output);
             } catch (IOException e) {

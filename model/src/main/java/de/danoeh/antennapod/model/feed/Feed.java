@@ -293,10 +293,7 @@ public class Feed extends FeedFile {
         if (other.isPaged() && !this.isPaged()) {
             return true;
         }
-        if (!TextUtils.equals(other.getNextPageLink(), this.getNextPageLink())) {
-            return true;
-        }
-        return false;
+        return !TextUtils.equals(other.getNextPageLink(), this.getNextPageLink());
     }
 
     public FeedItem getMostRecentItem() {

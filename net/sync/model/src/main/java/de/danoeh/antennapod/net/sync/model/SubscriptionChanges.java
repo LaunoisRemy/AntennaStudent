@@ -19,8 +19,8 @@ public class SubscriptionChanges {
 
     @Override
     public String toString() {
-        return "SubscriptionChange [added=" + added.toString()
-                + ", removed=" + removed.toString() + ", timestamp="
+        return "SubscriptionChange [added=" + added
+                + ", removed=" + removed + ", timestamp="
                 + timestamp + "]";
     }
 

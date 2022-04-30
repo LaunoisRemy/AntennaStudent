@@ -245,7 +245,7 @@ public class SwipeActions extends ItemTouchHelper.SimpleCallback implements Life
             String[] actions = prefs.split(",");
             if (actions.length == 2) {
                 this.right = Stream.of(swipeActions)
-                        .filter(a -> a.getId().equals(actions[0])).single();;
+                        .filter(a -> a.getId().equals(actions[0])).single();
                 this.left = Stream.of(swipeActions)
                         .filter(a -> a.getId().equals(actions[1])).single();
             }

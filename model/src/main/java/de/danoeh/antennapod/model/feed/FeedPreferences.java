@@ -99,10 +99,7 @@ public class FeedPreferences implements Serializable {
         if (!TextUtils.equals(username, other.username)) {
             return true;
         }
-        if (!TextUtils.equals(password, other.password)) {
-            return true;
-        }
-        return false;
+        return !TextUtils.equals(password, other.password);
     }
 
     /**

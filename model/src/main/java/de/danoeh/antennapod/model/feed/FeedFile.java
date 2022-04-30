@@ -56,10 +56,7 @@ public abstract class FeedFile extends FeedComponent {
         if (super.compareWithOther(other)) {
             return true;
         }
-        if (!TextUtils.equals(download_url, other.download_url)) {
-            return true;
-        }
-        return false;
+        return !TextUtils.equals(download_url, other.download_url);
     }
 
     /**

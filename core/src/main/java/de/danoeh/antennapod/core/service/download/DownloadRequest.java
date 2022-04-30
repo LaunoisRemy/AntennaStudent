@@ -32,7 +32,7 @@ public class DownloadRequest implements Parcelable {
     private long size;
     private int statusMsg;
     private boolean mediaEnqueued;
-    private boolean initiatedByUser;
+    private final boolean initiatedByUser;
 
     public DownloadRequest(@NonNull String destination, @NonNull String source, @NonNull String title, long feedfileId,
                            int feedfileType, String username, String password, boolean deleteOnFailure,
@@ -139,8 +139,7 @@ public class DownloadRequest implements Parcelable {
         if (username != null ? !username.equals(that.username) : that.username != null)
             return false;
         if (mediaEnqueued != that.mediaEnqueued) return false;
-        if (initiatedByUser != that.initiatedByUser) return false;
-        return true;
+        return initiatedByUser == that.initiatedByUser;
     }
 
     @Override
@@ -271,7 +270,7 @@ public class DownloadRequest implements Parcelable {
         private boolean deleteOnFailure = false;
         private final long feedfileId;
         private final int feedfileType;
-        private Bundle arguments = new Bundle();
+        private final Bundle arguments = new Bundle();
         private boolean initiatedByUser = true;
 
         public Builder(@NonNull String destination, @NonNull FeedMedia media) {

@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -51,7 +52,7 @@ public class BugReportActivity extends AppCompatActivity {
         try {
             File crashFile = CrashReportWriter.getFile();
             if (crashFile.exists()) {
-                stacktrace = IOUtils.toString(new FileInputStream(crashFile), Charset.forName("UTF-8"));
+                stacktrace = IOUtils.toString(new FileInputStream(crashFile), StandardCharsets.UTF_8);
             } else {
                 Log.d(TAG, stacktrace);
             }

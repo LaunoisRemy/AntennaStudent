@@ -7,6 +7,7 @@ import de.danoeh.antennapod.model.feed.Feed;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 
@@ -24,7 +25,7 @@ public class HtmlWriter implements ExportWriter {
         Log.d(TAG, "Starting to write document");
 
         InputStream templateStream = context.getAssets().open("html-export-template.html");
-        String template = IOUtils.toString(templateStream, "UTF-8");
+        String template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         template = template.replaceAll("\\{TITLE\\}", "Subscriptions");
         String[] templateParts = template.split("\\{FEEDS\\}");
 

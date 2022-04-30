@@ -72,10 +72,8 @@ public class CoverFragment extends Fragment {
     private TextView txtvPodcastTitle;
     private TextView txtvEpisodeTitle;
     private ImageView imgvCover;
-    private LinearLayout openDescription;
     private Space counterweight;
     private Space spacer;
-    private ImageButton butPrevChapter;
     private ImageButton butNextChapter;
     private LinearLayout episodeDetails;
     private LinearLayout chapterControl;
@@ -95,11 +93,11 @@ public class CoverFragment extends Fragment {
         episodeDetails = root.findViewById(R.id.episode_details);
         final ImageView descriptionIcon = root.findViewById(R.id.description_icon);
         chapterControl = root.findViewById(R.id.chapterButton);
-        butPrevChapter = root.findViewById(R.id.butPrevChapter);
+        ImageButton butPrevChapter = root.findViewById(R.id.butPrevChapter);
         butNextChapter = root.findViewById(R.id.butNextChapter);
 
         imgvCover.setOnClickListener(v -> onPlayPause());
-        openDescription = root.findViewById(R.id.openDescription);
+        LinearLayout openDescription = root.findViewById(R.id.openDescription);
         counterweight = root.findViewById(R.id.counterweight);
         spacer = root.findViewById(R.id.details_spacer);
         View.OnClickListener scrollToDesc = view ->

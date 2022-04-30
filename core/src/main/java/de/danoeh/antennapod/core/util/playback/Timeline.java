@@ -18,6 +18,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +59,7 @@ public class Timeline {
         String styleString = "";
         try {
             InputStream templateStream = context.getAssets().open("shownotes-style.css");
-            styleString = IOUtils.toString(templateStream, "UTF-8");
+            styleString = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }

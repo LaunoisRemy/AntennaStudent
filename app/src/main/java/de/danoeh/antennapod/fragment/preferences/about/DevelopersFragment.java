@@ -15,6 +15,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class DevelopersFragment extends ListFragment {
@@ -29,7 +30,7 @@ public class DevelopersFragment extends ListFragment {
         developersLoader = Single.create((SingleOnSubscribe<ArrayList<SimpleIconListAdapter.ListItem>>) emitter -> {
             ArrayList<SimpleIconListAdapter.ListItem> developers = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    getContext().getAssets().open("developers.csv"), "UTF-8"));
+                    getContext().getAssets().open("developers.csv"), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] info = line.split(";");

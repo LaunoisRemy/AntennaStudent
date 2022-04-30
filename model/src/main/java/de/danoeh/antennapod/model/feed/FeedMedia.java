@@ -142,10 +142,7 @@ public class FeedMedia extends FeedFile implements Playable {
                 return true;
             }
         }
-        if (other.size > 0 && other.size != size) {
-            return true;
-        }
-        return false;
+        return other.size > 0 && other.size != size;
     }
 
     @Override

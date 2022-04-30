@@ -36,7 +36,7 @@ public class ChapterReader extends ID3Reader {
     @Override
     protected void readFrame(@NonNull FrameHeader frameHeader) throws IOException, ID3ReaderException {
         if (FRAME_ID_CHAPTER.equals(frameHeader.getId())) {
-            Log.d(TAG, "Handling frame: " + frameHeader.toString());
+            Log.d(TAG, "Handling frame: " + frameHeader);
             Chapter chapter = readChapter(frameHeader);
             Log.d(TAG, "Chapter done: " + chapter);
             chapters.add(chapter);
@@ -62,7 +62,7 @@ public class ChapterReader extends ID3Reader {
 
     public void readChapterSubFrame(@NonNull FrameHeader frameHeader, @NonNull Chapter chapter)
             throws IOException, ID3ReaderException {
-        Log.d(TAG, "Handling subframe: " + frameHeader.toString());
+        Log.d(TAG, "Handling subframe: " + frameHeader);
         int frameStartPosition = getPosition();
         switch (frameHeader.getId()) {
             case FRAME_ID_TITLE:

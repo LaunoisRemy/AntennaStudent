@@ -6,10 +6,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class DurationParserTest {
-    private int milliseconds = 1;
-    private int seconds = 1000 * milliseconds;
-    private int minutes = 60 * seconds;
-    private int hours = 60 * minutes;
+    private final int milliseconds = 1;
+    private final int seconds = 1000 * milliseconds;
+    private final int minutes = 60 * seconds;
+    private final int hours = 60 * minutes;
 
     @Test
     public void testSecondDurationInMillis() {

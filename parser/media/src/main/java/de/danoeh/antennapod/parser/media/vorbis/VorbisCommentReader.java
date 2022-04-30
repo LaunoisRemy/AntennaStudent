@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public abstract class VorbisCommentReader {
@@ -95,7 +96,7 @@ public abstract class VorbisCommentReader {
     private String readUtf8String(InputStream input, long length) throws IOException {
         byte[] buffer = new byte[(int) length];
         IOUtils.readFully(input, buffer);
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         return charset.newDecoder().decode(ByteBuffer.wrap(buffer)).toString();
     }
 

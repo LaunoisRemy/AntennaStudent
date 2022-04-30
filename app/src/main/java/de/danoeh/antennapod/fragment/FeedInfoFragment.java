@@ -317,7 +317,7 @@ public class FeedInfoFragment extends Fragment implements Toolbar.OnMenuItemClic
             if (documentFile == null) {
                 throw new IllegalArgumentException("Unable to retrieve document tree");
             }
-            feed.setDownload_url(Feed.PREFIX_LOCAL_FOLDER + uri.toString());
+            feed.setDownload_url(Feed.PREFIX_LOCAL_FOLDER + uri);
             DBTasks.updateFeed(getContext(), feed, true);
         })
                 .subscribeOn(Schedulers.io())

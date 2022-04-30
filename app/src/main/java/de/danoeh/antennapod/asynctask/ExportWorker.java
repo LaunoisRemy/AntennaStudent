@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import de.danoeh.antennapod.core.export.ExportWriter;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
@@ -47,7 +48,7 @@ public class ExportWorker {
         return Observable.create(subscriber -> {
             OutputStreamWriter writer = null;
             try {
-                writer = new OutputStreamWriter(new FileOutputStream(output), Charset.forName("UTF-8"));
+                writer = new OutputStreamWriter(new FileOutputStream(output), StandardCharsets.UTF_8);
                 exportWriter.writeDocument(DBReader.getFeedList(), writer, context);
                 subscriber.onNext(output);
             } catch (IOException e) {

@@ -8,6 +8,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -44,11 +45,11 @@ public class BackportTrustManager {
             keystore.load(null); // Clear
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             keystore.setCertificateEntry("BACKPORT_COMODO_ROOT_CA", cf.generateCertificate(
-                    new ByteArrayInputStream(BackportCaCerts.COMODO.getBytes(Charset.forName("UTF-8")))));
+                    new ByteArrayInputStream(BackportCaCerts.COMODO.getBytes(StandardCharsets.UTF_8))));
             keystore.setCertificateEntry("SECTIGO_USER_TRUST_CA", cf.generateCertificate(
-                    new ByteArrayInputStream(BackportCaCerts.SECTIGO_USER_TRUST.getBytes(Charset.forName("UTF-8")))));
+                    new ByteArrayInputStream(BackportCaCerts.SECTIGO_USER_TRUST.getBytes(StandardCharsets.UTF_8))));
             keystore.setCertificateEntry("LETSENCRYPT_ISRG_CA", cf.generateCertificate(
-                    new ByteArrayInputStream(BackportCaCerts.LETSENCRYPT_ISRG.getBytes(Charset.forName("UTF-8")))));
+                    new ByteArrayInputStream(BackportCaCerts.LETSENCRYPT_ISRG.getBytes(StandardCharsets.UTF_8))));
 
             List<X509TrustManager> managers = new ArrayList<>();
             managers.add(getSystemTrustManager(keystore));

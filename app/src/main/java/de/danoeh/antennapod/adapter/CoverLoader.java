@@ -33,7 +33,7 @@ public class CoverLoader {
     private TextView txtvPlaceholder;
     private ImageView imgvCover;
     private boolean textAndImageCombined;
-    private MainActivity activity;
+    private final MainActivity activity;
 
     public CoverLoader(MainActivity activity) {
         this.activity = activity;
@@ -110,7 +110,7 @@ public class CoverLoader {
     static class CoverTarget extends CustomViewTarget<ImageView, PaletteBitmap> {
         private final WeakReference<TextView> placeholder;
         private final WeakReference<ImageView> cover;
-        private boolean textAndImageCombined;
+        private final boolean textAndImageCombined;
 
         public CoverTarget(TextView txtvPlaceholder, ImageView imgvCover, boolean textAndImageCombined) {
             super(imgvCover);

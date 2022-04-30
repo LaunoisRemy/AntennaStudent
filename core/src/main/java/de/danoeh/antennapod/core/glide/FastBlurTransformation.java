@@ -30,7 +30,7 @@ public class FastBlurTransformation extends BitmapTransformation {
         int targetWidth = outWidth / 3;
         int targetHeight = (int) (1.0 * outHeight * targetWidth / outWidth);
         Bitmap resized = ThumbnailUtils.extractThumbnail(source, targetWidth, targetHeight);
-        Bitmap result = fastBlur(resized, STACK_BLUR_RADIUS);
+        Bitmap result = fastBlur(resized);
         if (result == null) {
             Log.w(TAG, "result was null");
             return source;
@@ -53,7 +53,7 @@ public class FastBlurTransformation extends BitmapTransformation {
         messageDigest.update(TAG.getBytes(Charset.defaultCharset()));
     }
 
-    private static Bitmap fastBlur(Bitmap bitmap, int radius) {
+    private static Bitmap fastBlur(Bitmap bitmap) {
 
         // Stack Blur v1.0 from
         // http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
@@ -83,7 +83,7 @@ public class FastBlurTransformation extends BitmapTransformation {
         //
         // Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
 
-        if (radius < 1) {
+        if (FastBlurTransformation.STACK_BLUR_RADIUS < 1) {
             return null;
         }
 
@@ -96,7 +96,7 @@ public class FastBlurTransformation extends BitmapTransformation {
         int wm = w - 1;
         int hm = h - 1;
         int wh = w * h;
-        int div = radius + radius + 1;
+        int div = FastBlurTransformation.STACK_BLUR_RADIUS + FastBlurTransformation.STACK_BLUR_RADIUS + 1;
 
         int[] r = new int[wh];
         int[] g = new int[wh];
@@ -127,7 +127,7 @@ public class FastBlurTransformation extends BitmapTransformation {
         int stackstart;
         int[] sir;
         int rbs;
-        int r1 = radius + 1;
+        int r1 = FastBlurTransformation.STACK_BLUR_RADIUS + 1;
         int routsum;
         int goutsum;
         int boutsum;
@@ -137,9 +137,9 @@ public class FastBlurTransformation extends BitmapTransformation {
 
         for (y = 0; y < h; y++) {
             rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            for (i = -radius; i <= radius; i++) {
+            for (i = -FastBlurTransformation.STACK_BLUR_RADIUS; i <= FastBlurTransformation.STACK_BLUR_RADIUS; i++) {
                 p = pix[yi + Math.min(wm, Math.max(i, 0))];
-                sir = stack[i + radius];
+                sir = stack[i + FastBlurTransformation.STACK_BLUR_RADIUS];
                 sir[0] = (p & 0xff0000) >> 16;
                 sir[1] = (p & 0x00ff00) >> 8;
                 sir[2] = (p & 0x0000ff);
@@ -157,7 +157,7 @@ public class FastBlurTransformation extends BitmapTransformation {
                     boutsum += sir[2];
                 }
             }
-            stackpointer = radius;
+            stackpointer = FastBlurTransformation.STACK_BLUR_RADIUS;
 
             for (x = 0; x < w; x++) {
 
@@ -169,7 +169,7 @@ public class FastBlurTransformation extends BitmapTransformation {
                 gsum -= goutsum;
                 bsum -= boutsum;
 
-                stackstart = stackpointer - radius + div;
+                stackstart = stackpointer - FastBlurTransformation.STACK_BLUR_RADIUS + div;
                 sir = stack[stackstart % div];
 
                 routsum -= sir[0];
@@ -177,7 +177,7 @@ public class FastBlurTransformation extends BitmapTransformation {
                 boutsum -= sir[2];
 
                 if (y == 0) {
-                    vmin[x] = Math.min(x + radius + 1, wm);
+                    vmin[x] = Math.min(x + FastBlurTransformation.STACK_BLUR_RADIUS + 1, wm);
                 }
                 p = pix[yw + vmin[x]];
 
@@ -210,11 +210,11 @@ public class FastBlurTransformation extends BitmapTransformation {
         }
         for (x = 0; x < w; x++) {
             rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            yp = -radius * w;
-            for (i = -radius; i <= radius; i++) {
+            yp = -FastBlurTransformation.STACK_BLUR_RADIUS * w;
+            for (i = -FastBlurTransformation.STACK_BLUR_RADIUS; i <= FastBlurTransformation.STACK_BLUR_RADIUS; i++) {
                 yi = Math.max(0, yp) + x;
 
-                sir = stack[i + radius];
+                sir = stack[i + FastBlurTransformation.STACK_BLUR_RADIUS];
 
                 sir[0] = r[yi];
                 sir[1] = g[yi];
@@ -241,7 +241,7 @@ public class FastBlurTransformation extends BitmapTransformation {
                 }
             }
             yi = x;
-            stackpointer = radius;
+            stackpointer = FastBlurTransformation.STACK_BLUR_RADIUS;
             for (y = 0; y < h; y++) {
                 // Set alpha to 1
                 pix[yi] = 0xff000000 | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
@@ -250,7 +250,7 @@ public class FastBlurTransformation extends BitmapTransformation {
                 gsum -= goutsum;
                 bsum -= boutsum;
 
-                stackstart = stackpointer - radius + div;
+                stackstart = stackpointer - FastBlurTransformation.STACK_BLUR_RADIUS + div;
                 sir = stack[stackstart % div];
 
                 routsum -= sir[0];

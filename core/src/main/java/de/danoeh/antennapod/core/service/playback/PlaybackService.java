@@ -21,7 +21,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -105,7 +104,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     /**
      * Logging tag
      */
-    private static final String TAG = "PlaybackService";
+    protected static final String TAG = "PlaybackService";
 
     public static final String EXTRA_PLAYABLE = "PlaybackService.PlayableExtra";
     public static final String EXTRA_SHOULD_STREAM = "extra.de.danoeh.antennapod.core.service.shouldStream";
@@ -179,10 +178,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
      * Is true if service is running.
      */
     public static boolean isRunning = false;
-    /**
-     * Is true if the service was running, but paused due to headphone disconnect
-     */
-    private static boolean transientPause = false;
+
     /**
      * Is true if a Cast Device is connected to the service.
      */
@@ -196,6 +192,14 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     private CastStateListener castStateListener;
 
     private String autoSkippedFeedMediaId = null;
+
+    public PlaybackServiceMediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void setMediaPlayer(PlaybackServiceMediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+    }
 
     /**
      * Used for Lollipop notifications, Android Wear, and Android Auto.
@@ -435,8 +439,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     });
     }
 
-    private List<MediaBrowserCompat.MediaItem> loadChildrenSynchronous(@NonNull String parentId)
-            throws InterruptedException {
+    private List<MediaBrowserCompat.MediaItem> loadChildrenSynchronous(@NonNull String parentId) {
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
         if (parentId.equals(getResources().getString(R.string.app_name))) {
             mediaItems.add(createBrowsableMediaItem(R.string.queue_label, R.drawable.ic_playlist_black,
@@ -654,86 +657,114 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         switch (keycode) {
             case KeyEvent.KEYCODE_HEADSETHOOK:
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                if (status == PlayerStatus.PLAYING) {
-                    mediaPlayer.pause(!UserPreferences.isPersistNotify(), false);
-                } else if (status == PlayerStatus.PAUSED || status == PlayerStatus.PREPARED) {
-                    mediaPlayer.resume();
-                } else if (status == PlayerStatus.PREPARING) {
-                    mediaPlayer.setStartWhenPrepared(!mediaPlayer.isStartWhenPrepared());
-                } else if (status == PlayerStatus.INITIALIZED) {
-                    mediaPlayer.setStartWhenPrepared(true);
-                    mediaPlayer.prepare();
-                } else if (mediaPlayer.getPlayable() == null) {
-                    startPlayingFromPreferences();
-                } else {
-                    return false;
-                }
-                taskManager.restartSleepTimer();
-                return true;
+                return media_play_pause(status);
             case KeyEvent.KEYCODE_MEDIA_PLAY:
-                if (status == PlayerStatus.PAUSED || status == PlayerStatus.PREPARED) {
-                    mediaPlayer.resume();
-                } else if (status == PlayerStatus.INITIALIZED) {
-                    mediaPlayer.setStartWhenPrepared(true);
-                    mediaPlayer.prepare();
-                } else if (mediaPlayer.getPlayable() == null) {
-                    startPlayingFromPreferences();
-                } else {
-                    return false;
-                }
-                taskManager.restartSleepTimer();
-                return true;
+                return media_play(status);
             case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                if (status == PlayerStatus.PLAYING) {
-                    mediaPlayer.pause(!UserPreferences.isPersistNotify(), false);
-                    return true;
-                }
-                return false;
+                return media_pause(status);
             case KeyEvent.KEYCODE_MEDIA_NEXT:
-                if (!notificationButton) {
-                    // Handle remapped button as notification button which is not remapped again.
-                    return handleKeycode(UserPreferences.getHardwareForwardButton(), true);
-                } else if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
-                    mediaPlayer.skip();
-                    return true;
-                }
-                return false;
+                return media_next(notificationButton);
             case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
-                    mediaPlayer.seekDelta(UserPreferences.getFastForwardSecs() * 1000);
-                    return true;
-                }
-                return false;
+                return media_fast_forward(UserPreferences.getFastForwardSecs());
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                if (!notificationButton) {
-                    // Handle remapped button as notification button which is not remapped again.
-                    return handleKeycode(UserPreferences.getHardwarePreviousButton(), true);
-                } else if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
-                    mediaPlayer.seekTo(0);
-                    return true;
-                }
-                return false;
+                return media_previous(notificationButton);
             case KeyEvent.KEYCODE_MEDIA_REWIND:
-                if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
-                    mediaPlayer.seekDelta(-UserPreferences.getRewindSecs() * 1000);
-                    return true;
-                }
-                return false;
+                return media_fast_forward(-UserPreferences.getRewindSecs());
             case KeyEvent.KEYCODE_MEDIA_STOP:
-                if (status == PlayerStatus.PLAYING) {
-                    mediaPlayer.pause(true, true);
-                }
-
-                stateManager.stopForeground(true); // gets rid of persistent notification
-                return true;
+                return media_stop(status);
             default:
-                Log.d(TAG, "Unhandled key code: " + keycode);
-                if (info.playable != null && info.playerStatus == PlayerStatus.PLAYING) {   // only notify the user about an unknown key event if it is actually doing something
-                    String message = String.format(getResources().getString(R.string.unknown_media_key), keycode);
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                }
+                media_default(keycode, info);
         }
         return false;
+    }
+
+    private void media_default(int keycode, PlaybackServiceMediaPlayer.PSMPInfo info) {
+        Log.d(TAG, "Unhandled key code: " + keycode);
+        if (info.playable != null && info.playerStatus == PlayerStatus.PLAYING) {   // only notify the user about an unknown key event if it is actually doing something
+            String message = String.format(getResources().getString(R.string.unknown_media_key), keycode);
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean media_stop(PlayerStatus status) {
+        if (status == PlayerStatus.PLAYING) {
+            mediaPlayer.pause(true, true);
+        }
+
+        stateManager.stopForeground(true); // gets rid of persistent notification
+        return true;
+    }
+
+    private boolean media_previous(boolean notificationButton) {
+        if (!notificationButton) {
+            // Handle remapped button as notification button which is not remapped again.
+            return handleKeycode(UserPreferences.getHardwarePreviousButton(), true);
+        } else if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
+            mediaPlayer.seekTo(0);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean media_fast_forward(int fastForwardSecs) {
+        if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
+            mediaPlayer.seekDelta(fastForwardSecs * 1000);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean media_next(boolean notificationButton) {
+        if (!notificationButton) {
+            // Handle remapped button as notification button which is not remapped again.
+            return handleKeycode(UserPreferences.getHardwareForwardButton(), true);
+        } else if (getStatus() == PlayerStatus.PLAYING || getStatus() == PlayerStatus.PAUSED) {
+            mediaPlayer.skip();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean media_pause(PlayerStatus status) {
+        if (status == PlayerStatus.PLAYING) {
+            mediaPlayer.pause(!UserPreferences.isPersistNotify(), false);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean media_play(PlayerStatus status) {
+        if (status == PlayerStatus.PAUSED || status == PlayerStatus.PREPARED) {
+            mediaPlayer.resume();
+        } else if (status == PlayerStatus.INITIALIZED) {
+            mediaPlayer.setStartWhenPrepared(true);
+            mediaPlayer.prepare();
+        } else if (mediaPlayer.getPlayable() == null) {
+            startPlayingFromPreferences();
+        } else {
+            return false;
+        }
+        taskManager.restartSleepTimer();
+        return true;
+    }
+
+    private boolean media_play_pause(PlayerStatus status) {
+        if (status == PlayerStatus.PLAYING) {
+            mediaPlayer.pause(!UserPreferences.isPersistNotify(), false);
+        } else if (status == PlayerStatus.PAUSED || status == PlayerStatus.PREPARED) {
+            mediaPlayer.resume();
+        } else if (status == PlayerStatus.PREPARING) {
+            mediaPlayer.setStartWhenPrepared(!mediaPlayer.isStartWhenPrepared());
+        } else if (status == PlayerStatus.INITIALIZED) {
+            mediaPlayer.setStartWhenPrepared(true);
+            mediaPlayer.prepare();
+        } else if (mediaPlayer.getPlayable() == null) {
+            startPlayingFromPreferences();
+        } else {
+            return false;
+        }
+        taskManager.restartSleepTimer();
+        return true;
     }
 
     private void startPlayingFromPreferences() {
@@ -743,7 +774,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                 .subscribe(
                         playable -> {
                             boolean localFeed = URLUtil.isContentUrl(playable.getStreamUrl());
-                            if (PlaybackPreferences.getCurrentEpisodeIsStream()
+                            if (Playbac kPreferences.getCurrentEpisodeIsStream()
                                     && !NetworkUtils.isStreamingAllowed() && !localFeed) {
                                 displayStreamingNotAllowedNotification(
                                         new PlaybackServiceStarter(this, playable)
@@ -1414,11 +1445,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     }
 
     private void bluetoothNotifyChange(PlaybackServiceMediaPlayer.PSMPInfo info, String whatChanged) {
-        boolean isPlaying = false;
-
-        if (info.playerStatus == PlayerStatus.PLAYING) {
-            isPlaying = true;
-        }
+        boolean isPlaying = info.playerStatus == PlayerStatus.PLAYING;
 
         if (info.playable != null) {
             Intent i = new Intent(whatChanged);
@@ -1455,96 +1482,18 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         }
     };
 
+    private UnPauseClass unPauseClass = new UnPauseClass(this);
     /**
      * Pauses playback when the headset is disconnected and the preference is
      * set
      */
-    private final BroadcastReceiver headsetDisconnected = new BroadcastReceiver() {
-        private static final String TAG = "headsetDisconnected";
-        private static final int UNPLUGGED = 0;
-        private static final int PLUGGED = 1;
+    private final BroadcastReceiver headsetDisconnected = this.unPauseClass.headsetDisconnected;
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (isInitialStickyBroadcast()) {
-                // Don't pause playback after we just started, just because the receiver
-                // delivers the current headset state (instead of a change)
-                return;
-            }
+    private final BroadcastReceiver bluetoothStateUpdated = this.unPauseClass.bluetoothStateUpdated;
 
-            if (TextUtils.equals(intent.getAction(), Intent.ACTION_HEADSET_PLUG)) {
-                int state = intent.getIntExtra("state", -1);
-                Log.d(TAG, "Headset plug event. State is " + state);
-                if (state != -1) {
-                    if (state == UNPLUGGED) {
-                        Log.d(TAG, "Headset was unplugged during playback.");
-                    } else if (state == PLUGGED) {
-                        Log.d(TAG, "Headset was plugged in during playback.");
-                        unpauseIfPauseOnDisconnect(false);
-                    }
-                } else {
-                    Log.e(TAG, "Received invalid ACTION_HEADSET_PLUG intent");
-                }
-            }
-        }
-    };
+    private final BroadcastReceiver audioBecomingNoisy = this.unPauseClass.audioBecomingNoisy;
 
-    private final BroadcastReceiver bluetoothStateUpdated = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (TextUtils.equals(intent.getAction(), BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)) {
-                int state = intent.getIntExtra(BluetoothA2dp.EXTRA_STATE, -1);
-                if (state == BluetoothA2dp.STATE_CONNECTED) {
-                    Log.d(TAG, "Received bluetooth connection intent");
-                    unpauseIfPauseOnDisconnect(true);
-                }
-            }
-        }
-    };
 
-    private final BroadcastReceiver audioBecomingNoisy = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // sound is about to change, eg. bluetooth -> speaker
-            Log.d(TAG, "Pausing playback because audio is becoming noisy");
-            pauseIfPauseOnDisconnect();
-        }
-    };
-
-    /**
-     * Pauses playback if PREF_PAUSE_ON_HEADSET_DISCONNECT was set to true.
-     */
-    private void pauseIfPauseOnDisconnect() {
-        Log.d(TAG, "pauseIfPauseOnDisconnect()");
-        transientPause = (mediaPlayer.getPlayerStatus() == PlayerStatus.PLAYING);
-        if (UserPreferences.isPauseOnHeadsetDisconnect() && !isCasting()) {
-            mediaPlayer.pause(!UserPreferences.isPersistNotify(), false);
-        }
-    }
-
-    /**
-     * @param bluetooth true if the event for unpausing came from bluetooth
-     */
-    private void unpauseIfPauseOnDisconnect(boolean bluetooth) {
-        if (mediaPlayer.isAudioChannelInUse()) {
-            Log.d(TAG, "unpauseIfPauseOnDisconnect() audio is in use");
-            return;
-        }
-        if (transientPause) {
-            transientPause = false;
-            if (!bluetooth && UserPreferences.isUnpauseOnHeadsetReconnect()) {
-                mediaPlayer.resume();
-            } else if (bluetooth && UserPreferences.isUnpauseOnBluetoothReconnect()) {
-                // let the user know we've started playback again...
-                Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
-                if (v != null) {
-                    v.vibrate(500);
-                }
-                mediaPlayer.resume();
-            }
-        }
-    }
 
     private final BroadcastReceiver shutdownReceiver = new BroadcastReceiver() {
 

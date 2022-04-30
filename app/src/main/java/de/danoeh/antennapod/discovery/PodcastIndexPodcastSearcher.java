@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -108,7 +109,7 @@ public class PodcastIndexPodcastSearcher implements PodcastSearcher {
     private static String sha1(String clearString) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(clearString.getBytes("UTF-8"));
+            messageDigest.update(clearString.getBytes(StandardCharsets.UTF_8));
             return toHex(messageDigest.digest());
         } catch (Exception ignored) {
             ignored.printStackTrace();

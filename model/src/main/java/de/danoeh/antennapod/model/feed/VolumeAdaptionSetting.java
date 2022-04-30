@@ -6,7 +6,7 @@ public enum VolumeAdaptionSetting {
     HEAVY_REDUCTION(2, 0.2f);
 
     private final int value;
-    private float adaptionFactor;
+    private final float adaptionFactor;
 
     VolumeAdaptionSetting(int value, float adaptionFactor) {
         this.value = value;

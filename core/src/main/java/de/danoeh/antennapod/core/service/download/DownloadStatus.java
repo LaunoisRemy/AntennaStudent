@@ -33,7 +33,7 @@ public class DownloadStatus {
 	 */
     private String reasonDetailed;
 	private boolean successful;
-	private Date completionDate;
+	private final Date completionDate;
 	private final long feedfileId;
 	/**
 	 * Is used to determine the type of the feedfile even if the feedfile does
